@@ -27,20 +27,24 @@ def main():
     llm_multi_agents = LLM_MultiAgents([openai_model,claude_model,google_model])
 
     while True:
-        # Read the original prompt from the input file
+        # Read the original prompt from the input
         original_prompt = input("ask me something..")
-        original_answer = llm_multi_agents.generate_answer(openai_model,original_prompt)[0]
+        original_answer = llm_multi_agents.call(openai_model, original_prompt)[0]
+
         # Generate optimized prompts
-        optimized_prompts = llm_multi_agents.generate_different_version(openai_model, original_prompt)
+        optimized_prompts = llm_multi_agents.generate_different_version(openai_model, original_prompt,N_version=1)
 
         # Process answers from Claude and Google models
-        answer_claude = llm_multi_agents.generate_answer(claude_model,optimized_prompts[0])[0]
-        answer_google = llm_multi_agents.generate_answer(google_model,optimized_prompts[1])[0]
+        answers = llm_multi_agents.call([google_model,claude_model], optimized_prompts[0])
 
+        # Assign the answers to the corresponding variables
+        answer_google = answers[0]
+        answer_claude = answers[1]
+        print(answer_google,"**\n\n**",answer_claude)
         # Generate the final answer
         final_answer = llm_multi_agents.combine_answer(openai_model, [answer_claude, answer_google])
 
-        #save chat
+        # Save chat
         llm_multi_agents.save_chat()
 
 
