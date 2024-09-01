@@ -40,7 +40,7 @@ def main():
         # Assign the answers to the corresponding variables
         answer_google = answers[0]
         answer_claude = answers[1]
-        print(answer_google,"**\n\n**",answer_claude)
+        
         # Generate the final answer
         final_answer = llm_multi_agents.combine_answer(openai_model, [answer_claude, answer_google])
 
