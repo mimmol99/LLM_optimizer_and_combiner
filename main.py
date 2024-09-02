@@ -23,29 +23,32 @@ def main():
     openai_model = LLM_Model(openai_model_name)
     claude_model = LLM_Model(claude_model_name)
     google_model =  LLM_Model(google_model_name)
-
-    llm_multi_agents = LLM_MultiAgents([openai_model,claude_model,google_model])
+    
+    models = [openai_model,claude_model,google_model]
+    generator_model = openai_model
+    answer_model = [google_model,claude_model]
+    combiner_model = openai_model
+    
+    llm_multi_agents = LLM_MultiAgents(models)
 
     while True:
         # Read the original prompt from the input
-        original_prompt = input("ask me something..")
-        original_answer = llm_multi_agents.call(openai_model, original_prompt)[0]
-
+        original_prompt = input("ask me something..(or insert 'exit')\n")
+        if original_prompt=="exit":
+            break
+        original_answer = llm_multi_agents.call(generator_model, original_prompt)[0]
         # Generate optimized prompts
-        optimized_prompts = llm_multi_agents.generate_different_version(openai_model, original_prompt,N_version=1)
-
+        optimized_prompts = llm_multi_agents.generate_different_version(generator_model, original_prompt,N_version=1)
         # Process answers from Claude and Google models
-        answers = llm_multi_agents.call([google_model,claude_model], optimized_prompts[0])
-
-        # Assign the answers to the corresponding variables
-        answer_google = answers[0]
-        answer_claude = answers[1]
-        
+        answers = llm_multi_agents.call(answer_model, optimized_prompts[0])
         # Generate the final answer
-        final_answer = llm_multi_agents.combine_answer(openai_model, [answer_claude, answer_google])
-
-        # Save chat
+        final_answer = llm_multi_agents.combine_answer(combiner_model, answers)
+        #save all models history locally
         llm_multi_agents.save_chat()
+        print(f"Optimized_and_combined_answer:\n{final_answer}")
+    print("All messages have been saved locally!")
+        
+        
 
 
 if __name__ == "__main__":

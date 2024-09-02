@@ -30,7 +30,7 @@ class LLM_MultiAgents():
 
     def generate_different_version(self, model: LLM_Model, prompt: str, N_version=2) -> List[str]:
         model = self.filter_models(model)[0]
-        return [model.generate_answer(f"Generate a different and more complete version of this prompt: Prompt: ''' {prompt} '''. Your New Prompt:") for _ in range(N_version)]
+        return [model.generate_answer(f"Generate a different and more complete version of this prompt,if there code,keep the entire code in the new prompt: Prompt to be improved: ''' {prompt} '''. Your New Improved Prompt:") for _ in range(N_version)]
 
     def combine_answer(self, model: LLM_Model, answers: List[str]) -> str:
         model = self.filter_models(model)[0]
