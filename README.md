@@ -38,3 +38,10 @@ python3 gui.py
 
 to use a simple tkinter window to graphically insert prompt and it shows in output the two answers, the original one and the improved one.
 
+# Additional features
+
+Is possible to perform self-refine and CoT.
+
+# Future Features
+
+Vision capacity
