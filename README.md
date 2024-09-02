@@ -28,4 +28,13 @@ run:
 python3 main.py
 ```
 
-and now insert your prompt.
+and now insert your prompt as terminal input.
+
+Otherwise run:
+
+```python 
+python3 gui.py
+```
+
+to use a simple tkinter window to graphically insert prompt and it shows in output the two answers, the original one and the improved one.
+
