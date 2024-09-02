@@ -12,12 +12,20 @@ An other LLM model combines these answer in a final one.
 
 # Requirements
 
+create a api_key.env file within the API_KEYS of the models you prefer to use.
+
+then install necessary packages through pip:
+
 ```python 
-pip install requiremtns.txt
+pip install -r requirements.txt
 ```
 
 # Usage  Example
 
+run:
+
 ```python 
 python3 main.py
 ```
+
+and now insert your prompt.
