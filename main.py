@@ -36,13 +36,13 @@ def main():
         original_prompt = input("ask me something..(or insert 'exit')\n")
         if original_prompt=="exit":
             break
-        original_answer = llm_multi_agents.call(generator_model, original_prompt)[0]
+        original_answer = llm_multi_agents.call_model(generator_model, original_prompt,apply_refine = True,apply_cot = False)
         # Generate optimized prompts
         optimized_prompts = llm_multi_agents.generate_different_version(generator_model, original_prompt,N_version=1)
         # Process answers from Claude and Google models
-        answers = llm_multi_agents.call(answer_model, optimized_prompts[0])
+        answers = llm_multi_agents.call_models(answer_model, optimized_prompts[0],apply_refine = True,apply_cot = True)
         # Generate the final answer
-        final_answer = llm_multi_agents.combine_answer(combiner_model, answers)
+        final_answer = llm_multi_agents.combine_answer(combiner_model, answers,apply_refine = True)
         #save all models history locally
         llm_multi_agents.save_chat()
         print(f"Optimized_and_combined_answer:\n{final_answer}")

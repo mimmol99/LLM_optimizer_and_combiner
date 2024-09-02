@@ -14,28 +14,36 @@ class LLM_MultiAgents():
         for model in self.filter_models(models):
             model.set_system_instruction(instruction)
 
-    def call(self, models: LLM_Model | List[LLM_Model], prompt: str) -> List[str]:
+    def call_model(self, model: LLM_Model, prompt: str, apply_refine: bool = False, apply_cot: bool = False) -> str:
+        answer = model.generate_answer(prompt)
+        if apply_refine:
+            answer = model.self_refine(answer)
+        if apply_cot:
+            answer = model.chain_of_thought(answer)
+        return answer
+    
+    def call_models(self, models: LLM_Model | List[LLM_Model], prompt: str, apply_refine: bool = False, apply_cot: bool = False) -> List[str]:
         models = self.filter_models(models)
         with ThreadPoolExecutor() as executor:
-            results = list(executor.map(lambda model: model.generate_answer(prompt), models))
+            results = list(executor.map(lambda model: self.call_model(model,prompt,apply_refine = apply_refine,apply_cot = apply_cot), models))
         return results
     
-    def call_parallell(self, models: List[LLM_Model], prompts: List[str]) -> List[str]:
+    def call_prompts_in_parallell(self, models: List[LLM_Model], prompts: List[str], apply_refine: bool = False, apply_cot: bool = False) -> List[str]:
         if len(models) != len(prompts):
             raise ValueError("The number of models and prompts must be the same.")
         models = self.filter_models(models)
         with ThreadPoolExecutor() as executor:
-            results = list(executor.map(lambda pair: pair[0].generate_answer(pair[1]), zip(models, prompts)))
+            results = list(executor.map(lambda pair: self.call_model(model = pair[0],prompt = pair[1],apply_refine = apply_refine,apply_cot = apply_cot), zip(models, prompts)))
         return results
 
-    def generate_different_version(self, model: LLM_Model, prompt: str, N_version=2) -> List[str]:
+    def generate_different_version(self, model: LLM_Model, prompt: str, N_version=2,apply_refine: bool = False, apply_cot: bool = False) -> List[str]:
         model = self.filter_models(model)[0]
-        return [model.generate_answer(f"Generate a different and more complete version of this prompt,if there code,keep the entire code in the new prompt: Prompt to be improved: ''' {prompt} '''. Your New Improved Prompt:") for _ in range(N_version)]
+        return [self.call_model(model,f"Generate a different and more complete version of this prompt,if there is code inside,keep the whole code in the new prompt: Prompt to be improved: ''' {prompt} '''. Your New Improved Prompt:",apply_refine,apply_cot) for _ in range(N_version)]
 
-    def combine_answer(self, model: LLM_Model, answers: List[str]) -> str:
+    def combine_answer(self, model: LLM_Model, answers: List[str],apply_refine: bool = False, apply_cot: bool = False) -> str:
         model = self.filter_models(model)[0]
-        prompt = f"Combine these different answers from different LLMs to obtain a final optimized and combined answer: 'Answer:'{'Answer:'.join(answers)} Your final combined Answer:"
-        return model.generate_answer(prompt)
+        prompt = f"Combine these different answers from different LLMs to obtain a final optimized and combined answer,if there is code in one or more answer,combine the code to obtain the best code possible: 'Answer:'{'Answer:'.join(answers)} Your final combined Answer:"
+        return self.call_model(model,prompt,apply_refine = apply_refine,apply_cot = apply_cot)
     
     def save_chat(self, path=None):
         for model in self.models:

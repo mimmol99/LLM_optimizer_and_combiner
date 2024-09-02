@@ -106,7 +106,7 @@ class LLMApp:
         self.root.update_idletasks()
         
         # Fetching original answer from OpenAI model
-        original_answer = self.llm_multi_agents.call(self.generator_model, original_prompt)[0]
+        original_answer = self.llm_multi_agents.call_model(self.generator_model, original_prompt)
         
         self.progress['value'] = 20
         self.root.update_idletasks()
@@ -118,7 +118,7 @@ class LLMApp:
         self.root.update_idletasks()
 
         # Fetching answers from Google and Claude models
-        answers = self.llm_multi_agents.call(self.answer_model, optimized_prompts[0])
+        answers = self.llm_multi_agents.call_models(self.answer_model, optimized_prompts[0],apply_refine=True,apply_cot=True)
 
         self.progress['value'] = 80
         self.root.update_idletasks()
