@@ -2,7 +2,7 @@
 
 Use of different LLM models to create a more complete,detailed and accurate answer.
 
-One LLM model generates one or more optimized prompt to give as input to one or more different LLMs.
+One LLM model generates one or more optimized prompt each given as input to one or more different LLMs.
 
 An other LLM model combines these answer in a final one.
 
